@@ -11,6 +11,8 @@ numpy = "^1.26.4"
 natsort = "^8.4.0"
 opencv-python = "^4.9.0.80"
 pillow = "^10.2.0"
+pandas = "^2.2.1"
+tensorflow = "^2.15.0.post1"
 
 
 [build-system]
