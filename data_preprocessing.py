@@ -5,6 +5,9 @@ import pandas as pd
 from natsort import natsorted
 import cv2
 from PIL import Image
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
+import segmentation_models as sm
 
 def rgb_to_labels(img, mask_labels):
 
@@ -44,5 +47,12 @@ for i in range(mask_dataset.shape[0]):
 
 labels = np.array(labels)
 labels = np.expand_dims(labels, axis=3)
-print(labels)
 
+labels_cat = tf.keras.utils.to_categorical(labels, num_classes=len(np.unique(labels)))
+X_train, X_test, y_train, y_test = train_test_split(image_dataset, labels_cat, test_size = 0.2, random_state = 24)
+
+os.environ['SM_FRAMEWORK'] = 'tf.keras'
+BACKBONE = 'resnet34'
+preprocess_input = sm.get_preprocessing(BACKBONE)
+
+print("Done")
