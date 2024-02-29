@@ -55,4 +55,19 @@ os.environ['SM_FRAMEWORK'] = 'tf.keras'
 BACKBONE = 'resnet34'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
-print("Done")
+X_train_prepr = preprocess_input(X_train)
+X_test_prepr = preprocess_input(X_test)
+
+model_resnet_backbone = sm.Unet(BACKBONE, encoder_weights='imagenet', classes=n_classes, activation='softmax')
+
+metrics=['accuracy']
+model_resnet_backbone.compile(optimizer='adam', loss='categorical_crossentropy', metrics=metrics)
+
+history = model_resnet_backbone.fit(X_train_prepr,
+          y_train,
+          batch_size=16,
+          epochs=100,
+          verbose=1,
+          validation_data=(X_test_prepr, y_test))
+
+model_resnet_backbone.save('./models/resnet_backbone.hdf5')
