@@ -46,6 +46,7 @@
 `segmented_frame = cv2.cvtColor(segmented_frame, cv2.COLOR_RGB2BGR)`
 10) Возвращаем отсегментированный кадр.
 
+![Отсегментированный кадр](4.jpg)
 
 ## 2. Тепловая карта
 
