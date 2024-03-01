@@ -137,3 +137,4 @@ for point in motion_zone_points:
 for i in range(len(motion_zone_points) - 1):
    cv2.line(frame, motion_zone_points[i], motion_zone_points[i + 1], (255, 0, 0), 2)
 ```
+![Зона для движения](9.jpg)
