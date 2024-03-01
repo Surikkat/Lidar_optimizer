@@ -97,4 +97,43 @@ if heatmap[x, y] < 0:
 10) Возвращаем цветную тепловую карту.
 `return heatmap_colored`
 
+![Тепловая карта](7.jpg)
+
 ## 3. Зона для движения
+
+![Алгоритм построения зоны для движения](8.jpg)
+
+1) Получаем список точек, которые являются вершинами полигона для движения.
+   1.1) Приводим Heatmap и изображение к одному размеру.
+   `stretched_mask = cv2.resize(mask, (x, y))`
+   1.2) Создаём нулевой тензор размерности Heatmap.
+   `gray_mask = np.zeros_like(stretched_mask[:,:,0])`
+   1.3) Заносим в него значения красного канала Heatmap.
+   `gray_mask = stretched_mask[:,:,2]`
+   1.4) Если значение этого канала больше некоторого порогового значения, значит там точно препятствие. Отсетиваем пиксели без препятствия.
+   `obstacle_indices = np.where(gray_mask > 200)`
+   1.5) Теперь проходим по всем координатам y от 37% до 63% высоты кадра (это полоса для движения).
+   `for y in range(int(480 * 0.37), int(480 * 0.63)):`
+      a) Выбираем все пиксели препятствия на этой высоте.
+      `x_values = obstacle_indices[1][obstacle_indices[0] == y]`
+      b) Выбираем из них, те, которые находятся справа от центра (будем ехать по правой стороне).
+      `right_half_x_values = x_values[x_values > x/2]`
+      c)   Из них выбираем минимальное x, т.е. самое левое положение препятствия. В противном случае (x/2, y).
+      ```
+      if len(right_half_x_values) > 0:
+         min_x = np.min(right_half_x_values)
+         motion_zone_points.append((min_x, y))
+      else:
+         motion_zone_points.append((x/2, y))
+      ```
+2) Рисуем вспомогательные линии и соединяем точки:
+```
+cv2.line(frame, motion_zone_points[0], (424, int(480 * 0.37)), (0, 255, 0), 2)
+cv2.line(frame, motion_zone_points[-1], (424, int(480 * 0.63)), (0, 255, 0), 2)
+
+for point in motion_zone_points:
+   cv2.circle(frame, point, 5, (0, 255, 0), -1)
+
+for i in range(len(motion_zone_points) - 1):
+   cv2.line(frame, motion_zone_points[i], motion_zone_points[i + 1], (255, 0, 0), 2)
+```
